@@ -1,0 +1,6 @@
+include baseconfig
+include nodeconfig
+include consulconfig
+include gitconfig
+include librariesconfig 
+include haproxyconfig

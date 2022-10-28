@@ -1,0 +1,36 @@
+Vagrant.configure("2") do |config|
+
+  if Vagrant.has_plugin? "vagrant-vbguest"
+    config.vbguest.no_install  = true
+    config.vbguest.auto_update = false
+    config.vbguest.no_remote   = true
+  end
+
+  config.vm.define :servidorHaproxy do |servidorHaproxy|
+    servidorHaproxy.vm.box = "bento/ubuntu-20.04"
+    servidorHaproxy.vm.network :private_network, ip: "192.168.200.3"
+    servidorHaproxy.vm.hostname = "servidorHaproxy"
+    servidorHaproxy.vm.provision "shell", path: "script_puppet.sh"  
+    servidorHaproxy.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "puppet/manifests"
+      puppet.manifest_file = "config_server.pp"
+      puppet.module_path = "puppet/modules"
+       end
+  end
+
+  config.vm.define :servidorConsul do |servidorConsul|
+    servidorConsul.vm.box = "bento/ubuntu-20.04"
+    servidorConsul.vm.network :private_network, ip: "192.168.200.2"
+    servidorConsul.vm.hostname = "servidorConsul"
+    servidorConsul.vm.provision "shell", path: "script_puppet.sh"
+    servidorConsul.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "puppet/manifests"
+      puppet.manifest_file = "config_cliente.pp"
+      puppet.module_path = "puppet/modules"
+       end
+
+  end
+   config.vm.synced_folder ".", "/home/vagrant/carpeta_sinc", type:"virtualbox"
+
+
+end
